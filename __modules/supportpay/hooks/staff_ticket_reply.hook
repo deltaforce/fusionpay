@@ -1,0 +1,7 @@
+<?php
+if (!defined('SWIFT_MODULESDIRECTORY')) {
+	define('SWIFT_MODULESDIRECTORY', SWIFT_APPSDIRECTORY);
+}
+
+include SWIFT_MODULESDIRECTORY."/supportpay/hooks/staff_ticket_billing.hook";
+?>

@@ -1,0 +1,19 @@
+body { width: 64em; font-family: Verdana; }
+table.items { border: 0px; width: 80%; border-spacing: 0px; }
+td.mainfirst { border-left: solid 1px black; font-weight: bold; 
+               padding: 0.2em; background-color: #AAAAEE; }
+td.main { border-right: solid 1px black; padding: 0.2em; background-color: #EEEEFF; }
+td.final { border-top: solid 2px black; padding: 0.2em;}
+td.sumline { border-top: double 5px black;}
+td.sumvalue { background-color: #CCCCCC; font-weight: bold; padding: 0.2em;}
+th {border-bottom: solid 2px black;  padding: 0.2em; font-variant: small-caps;}
+div.Footer { text-align: center; font-style: italic; font-size: small; color: Gray; 
+             width: 80%; 
+             padding: 3em; padding-left: 10%; padding-right: 10%;}
+             
+img.logo { }
+/* The width here is 33% because the company logo is spec'd at 66% */
+div.addressbox { border: solid 1px black; float: right; width: 33%; }
+
+td.addresshdr { text-align: right; vertical-align: top; font-weight: bold; font-variant: small-caps; }
+td.addressval { text-align: left; vertical-align: top; }

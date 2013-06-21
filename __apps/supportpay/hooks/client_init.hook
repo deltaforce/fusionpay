@@ -1,0 +1,38 @@
+<?php
+  if (!defined('SWIFT_MODULESDIRECTORY')) {
+	  define('SWIFT_MODULESDIRECTORY', SWIFT_APPSDIRECTORY);
+  }
+
+	if (isset($_SERVER["QUERY_STRING"])) {
+      if (strpos($_SERVER["QUERY_STRING"],"/Tickets/Submit") !== FALSE) {
+        if ($_SERVER["REQUEST_METHOD"] == "POST") {
+          header("HTTP/1.0 307 Temporary Redirect");
+        } else {
+          header("HTTP/1.0 301 Moved Permanently");
+        }
+        header("Location: ".str_replace("/Tickets/Submit","/supportpay/SPSubmit",$_SERVER["REQUEST_URI"]));
+        exit;
+    }
+  }
+
+  // Workaround for Kayako bug SWIFT-974
+  $S = SWIFT::GetInstance();
+  $p = $S->Language->Get("sp_uw_viewpay");
+  if (empty($p)) {
+    $__LANG = array();
+    
+    foreach (array($S->Language->GetLanguageCode(),"en-us") as $langName) {
+      $langFile = './'.SWIFT_MODULESDIRECTORY.'/supportpay/locale/'.$langName.'/'.$langName.'.php';
+      if (file_exists($langFile)) {
+        require_once($langFile);
+		    $S->Language->_phraseCache = array_merge($S->Language->_phraseCache, $__LANG);
+		    unset($__LANG);
+        break;
+      }
+    }    
+  }
+  
+  // Workaround for issue with heavily customised sites accessing widgets outside the normal controller sequence.
+  require_once(SWIFT_MODULESDIRECTORY."/supportpay/client/class.Controller_SPWidgets.php");
+  Controller_SPWidgets::GetWidgetListForUser();
+?>

@@ -1,0 +1,25 @@
+<?php 
+global $SPFunctions;
+SWIFT_Loader::LoadLibrary('SupportPay:SPFunctions', "supportpay");
+
+$args = $_SWIFT->Router->getArguments();
+$ticketID = intval($args[0]);
+
+if (!empty($ticketID)) {
+  $doBillNow = $_SWIFT->Settings->getKey("settings","sp_billimmediately");
+/*
+  if (!$doBillNow) {
+    $Record = $_SWIFT->Database->QueryFetch("select count(1) ttl ".
+      "from ".TABLE_PREFIX."tickets t where t.ticketid = ".$ticketID.
+			"and ticketstatusid = ".intval($_SWIFT->Settings->getKey("settings","sp_statusclosed"));
+      
+    if (isset($Record["ttl"])) {
+      $doBillNow = $Record["ttl"];
+    }
+  }
+*/
+  if ($doBillNow) {
+    $SPFunctions->payTickets(SP_PAYTYPE_TICKET, array($ticketID));
+  }
+}
+?>

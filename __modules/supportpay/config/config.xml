@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<config>
+  <title>SupportPay</title>
+  <description>Automated payment handling for both tickets and live support.
+  </description>
+  <author>Jim Keir / SupportPay</author>
+  <version>1.0.3424</version>
+</config>

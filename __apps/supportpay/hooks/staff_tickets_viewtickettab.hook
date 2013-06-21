@@ -1,0 +1,145 @@
+<?php 
+global $SPFunctions;
+SWIFT_Loader::LoadLibrary('SupportPay:SPFunctions', "supportpay");
+
+$SPFunctions->showStatus();
+
+$args = $_SWIFT->Router->getArguments();
+$Record = $_SWIFT->Database->QueryFetch("select t.userid, t.departmentid, count(nullif(tp.staffid, 0)) staffreplies
+  from ".TABLE_PREFIX."tickets t, ".TABLE_PREFIX."ticketposts tp
+ where t.ticketid = ".intval($args[0])."
+   and tp.ticketid = t.ticketid
+ group by t.userid, t.departmentid");
+ 
+$defBilling = "";
+$credText = "";
+$reqBilling = false;
+$wantCredit = false;
+$flash = true;
+
+if (is_array($Record)) {
+  $_payDepts = $SPFunctions->getPayableDepts();
+  if (in_array($Record["departmentid"], $_payDepts)) {
+    $wantCredit = true;
+    $credit = $SPFunctions->getUserCredit($Record["userid"]);
+    $credText = "Credit: ";
+    $accept = $_SWIFT->Settings->getKey("settings","sp_accept");
+    
+    if ($accept != SP_ACCEPT_TICKETS) {
+      $credText .= $credit["minutes"].$SPFunctions->formatMTP(" {Minutes}");
+      $flash &= ($credit["minutes"] <= 0);
+    }
+    if ($accept == SP_ACCEPT_BOTH) $credText .= ", ";
+    if ($accept != SP_ACCEPT_MINUTES) {
+      $credText .= $credit["tickets"].$SPFunctions->formatMTP(" {Tickets}");
+      $flash &= ($credit["tickets"] <= 0);
+    }
+    
+    $credText = htmlentities($credText);
+
+    // Do we want to force all tickets to have time billable?
+    $defBilling = "";
+    $addMinutes = $_SWIFT->Settings->getKey("settings","sp_forcebill");
+    $reqBilling = $_SWIFT->Settings->getKey("settings","sp_forcebillany");
+
+    if ($addMinutes > 0) {
+      if ($_SWIFT->Settings->getKey("settings","sp_forcebillafter") <= $Record["staffreplies"]) {
+	      $defBilling = sprintf("%02d:%02d",floor($addMinutes/60), $addMinutes % 60);
+      }
+    }
+    
+    // Add a Payments tab.
+    $Payments = $_SWIFT->Database->QueryFetch("select count(1) pcnt from ".TABLE_PREFIX."sp_user_payments ".
+      "where ticketid = ".intval($args[0])." and paytype = ".SP_PAYTYPE_TICKET);
+ 			$PaymentsTabObject = $this->UserInterface->AddTab($this->Language->Get('sp_uw_master'), 'icon_ticketbilling.png',
+        'payments', $_isBillingTabSelected, false, 0, 
+        SWIFT::Get('basename') . '/SupportPay/CdtHist/Payments/' . $_SWIFT_TicketObject->GetTicketID());
+			$PaymentsTabObject->SetTabCounter($Payments["pcnt"]);
+  }
+}
+?>
+
+<script type="text/javascript">
+  var oldPostFunctions;
+  var billingTime = null;
+
+  function checkSufficientBilling() {
+  if (billingTime.value == "") {
+    alert(<?php echo "'".htmlspecialchars($_SWIFT->Language->Get("sp_forcebillmessage"), ENT_QUOTES)."'"; ?>);
+    return false;
+  }
+  return oldPostFunctions();
+  }
+
+  function addDefaultBilling() {
+  billingTime = document.getElementById('replybillingtimebillable');
+  if (billingTime != null) {
+  billingTime.value = "<?php echo $defBilling; ?>";
+  } else {
+    setTimeout("addDefaultBilling()", 500);
+  }
+
+<?php if ($reqBilling) { ?>
+  var submitButton = document.getElementById('View_Ticketform_submitform_2');
+  if (submitButton != null) {
+    oldPostFunctions = (submitButton.onclick) ? submitButton.onclick : function () {};
+    submitButton.onclick = checkSufficientBilling;
+    submitButton.setAttribute('onclick','checkSufficientBilling()');
+  }
+<?php } if ($wantCredit) { ?>
+
+  var infoPanel = null;
+  var allDivs = document.getElementsByTagName('div');
+
+  for(var i=0;i<allDivs.length;i++){
+       if (allDivs[i].className == 'navsub') {
+	      infoPanel = allDivs[i];
+	      break;
+       }
+    }
+  if (infoPanel != null) {
+    var pInfoBox, pInfoItem;
+    pInfoBox = document.createElement("div");
+    pInfoBox.setAttribute("class", "ticketinfoitem");
+
+    pInfoItem = document.createElement("div");
+    pInfoItem.setAttribute("class", "ticketinfotitle");
+    pInfoItem.appendChild(document.createTextNode("Credit"));
+    pInfoBox.appendChild(pInfoItem);
+
+    pInfoItem = document.createElement("div");
+    pInfoItem.setAttribute("class", "ticketinfoitemcontent");
+    pInfoItem.appendChild(document.createTextNode('<?php echo $credText; ?>'));
+    pInfoBox.appendChild(pInfoItem);
+    <?php if ($flash) { ?>
+      pInfoItem.setAttribute("style","color: red;");
+    <?php } ?>
+    infoPanel.appendChild(pInfoBox);
+
+    var allDivs = document.getElementsByTagName('div');
+    infoPanel = null;
+
+    for(var i=0;i<allDivs.length;i++){
+	       if (allDivs[i].className == 'ticketgeneralinfocontainer') {
+		      infoPanel = allDivs[i];
+		      break;
+	       }
+	    }
+
+      if (infoPanel != null) {
+		    var pInfoBox, pInfoItem;
+		    pInfoBox = document.createElement("span");
+		    pInfoBox.appendChild(document.createTextNode('<?php echo $credText; ?>'));
+		    infoPanel.appendChild(pInfoBox);
+        <?php if ($flash) { ?>
+          pInfoBox.setAttribute("style","color: red; text-decoration: blink;");
+        <?php } ?>
+      }
+  } else {
+   setTimeout("addDefaultBilling()", 500);
+  }
+  <?php } ?>
+}
+
+setTimeout("addDefaultBilling()", 500);
+</script>

@@ -1,0 +1,848 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- XML Generated On: 27 March 2011 09:19 AM -->
+
+<swifttemplate>
+  <title><![CDATA[Default]]></title>
+  <author><![CDATA[JKCC]]></author>
+  <version><![CDATA[4.01.203]]></version>
+  <category name="template_supportpay" app="supportpay" module="supportpay" icon="icon_sp.png">
+    <template name="sp_creditheader" date="1346683732">
+      <![CDATA[
+      <!-- WHMCS UserID is stored in sp_chdr_whmcsid if relevant -->
+      <table style='width: 100%;'><tr>
+      <td style='width: 40%;'><{$sp_chdr_title}></td>
+      <td style='width: 20%;' class='sptitlecredit'>
+      <{if $sp_chdr_credit[discount] < 100 }>
+        <{if $dominutes == true}>
+          <a href="<{$_basePath}>/supportpay/PurchasePage/Mins/<{$purchaseMins}>">
+            <span class=<{if $sp_chdr_credit[minutes] < 0}>"sp_cred_neg"<{else}>"sp_cred_pos"<{/if}> >
+              <{$sp_chdr_credit[minutes]}> <{$sp_chdr_minutetext}></span></a><{if $dotickets == true}>, <{/if}>
+       <{/if}>
+
+        <{if $dotickets == true}>
+          <a href="<{$_basePath}>/supportpay/PurchasePage/Tkts/<{$purchaseTkts}>">
+            <span class=<{if $sp_chdr_credit[tickets] < 0}>"sp_cred_neg"<{else}>"sp_cred_pos"<{/if}> >
+              <{$sp_chdr_credit[tickets]}> <{$sp_chdr_tickettext}></span></a>
+        <{/if}>
+      <{/if}>
+      </td>
+      <td></td>
+      </tr></table>
+]]>
+    </template>
+    <!-- BEGIN TEMPLATE: sp_invoice -->
+    <template name="sp_invoice" date="1346683733">
+      <![CDATA[<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title><{$companyname}> <{$_language[sp_invoicetitle]}></title>
+    <link rel="StyleSheet" href="<{$_themePath}>../supportpay/Invoice.css" type="text/css">
+<style>
+@media print { div.non-printable { display: none; } }
+</style>
+</head>
+<body>
+<div width="100%" class="non-printable">
+<form><input type="button" name="print"  value="Print" onClick="javascript: window.print();"></form>
+</div>
+<img src="<{$headerImage}>" class="logo"/>
+    <div class="addressbox">
+    <table border="0" width="100%">
+      <tr><td class="addresshdr">Account:</td><td class="addressval"><{$username}></td></tr>
+      <tr><td class="addresshdr">EMail:</td><td class="addressval"><{$primaryemail}></td></tr>
+      <{foreach key=fname item=fvalue from=$customfields}>
+        <{if ($fname != "AffiliateID") }>
+        <tr><td class="addresshdr"><{$fname}>:</td><td class="addressval"><{$fvalue}></td></tr>
+        <{/if}>
+      <{/foreach}>
+    </table>
+    </div>
+    <h1><{$_language[sp_invoicetitle]}></h1>
+    <p><b>Date:</b>&nbsp;<{$dateofinvoice}></p>
+    <p><b><{$companyname}></b> (<{$_basePath}>)</p><hr />
+    <!-- Invoice list -->
+    <div align="center">
+    <table class="items">
+        <tr>
+            <th>#</th><th>Date</th>
+<{if $dotickets == true}><th>Tickets</th><{/if}>
+<{if $dominutes == true}><th>Minutes</th><{/if}>
+<th>Paid By</th><th>Comments</th><th>Cost</th>
+        </tr>
+    <{foreach key=_inum item=_item from=$invoicelist}>
+        <tr>
+            <td align="right" class="mainfirst"><b><{$_inum}></b></td>
+            <td class="main"><{$_item[created]}></td>
+            <{if $dotickets == true}><td class="main"><{$_item[tickets]}></td><{/if}>
+            <{if $dominutes == true}><td class="main"><{$_item[minutes]}></td><{/if}>
+            <td class="main"><{$_item[paidby]}></td>
+            <td class="main"><{$_item[comments]}></td>
+            <td class="main"><{$_item[cost]}></td>
+        </tr>
+    <{/foreach}>
+<tr>
+  <{if $dotickets == true}><td class="final"></td><{/if}>
+  <{if $dominutes == true}><td class="final"></td><{/if}>
+  <td colspan="5" class="final"></td></tr>
+<{foreach key=_inum item=item from=$total}>
+  <tr>
+    <{if $dotickets == true}><td></td><{/if}>
+    <{if $dominutes == true}><td></td><{/if}>
+    <td colspan="3" align="right">
+    <td align="right"><b><{$_inum}></b></td><td class="sumvalue"><{$item}></td>
+  </tr>
+<{/foreach}>
+
+<tr>
+    <{if $dotickets == true}><td></td><{/if}>
+    <{if $dominutes == true}><td></td><{/if}>
+    <td colspan="4"></td>
+<td colspan="1" class="sumline">&nbsp;</td>
+</tr>
+    </table>
+    </div>
+    <hr />
+<div class="Footer"><{$footer}></div>
+</body>
+</html>]]>
+    </template>
+    <!-- END TEMPLATE: sp_invoice -->
+    <!-- BEGIN TEMPLATE: sp_reviewpay -->
+    <template name="sp_reviewpay" date="1346683732">
+      <![CDATA[<{RenderTemplate name="sp_css"}>
+<div align="center">
+<{if $paydetails[ACK] == "SUCCESS"}>
+
+  <table style='width: 100%; border-collapse: collapse;'>
+<tr class="sp_rowunderline"><th><{$_language[sp_itemnum]}></th><th><{$_language[sp_itemdesc]}></th>
+<th><{$_language[sp_itemcount]}></th><th><{$_language[sp_unitprice]}></th><th><{$_language[sp_tax]}></th><th><{$_language[sp_total]}></th></tr>
+<{foreach key=_itemID item=_itemData from=$lineitems}>
+  <tr class="sp_rowunderline"><td><{$_itemID+1}></th><td><{$_itemData[descr]}></td><td><{$_itemData[itemcount]}></td>
+  <td><{$_itemData[cost]}></td><td><{$_itemData[tax]}></td><td><{$_itemData[rowcost]}></td></tr>
+<{/foreach}>
+
+    <tr><td colspan="4"></td><th class="sp_subtotal"><{$_language[sp_amount]}></th><td class="sp_subamount"><{$payamount}></tr>
+    <tr><td colspan="4"></td><th class="sp_subtotal"><{$_language[sp_tax]}></th><td class="sp_subamount"><{$taxamount}></tr>
+    <tr><td colspan="4"></td><th class="sp_billtotal"><{$_language[sp_total]}></th><td class="sp_billamount"><{$fullamount}></tr>
+
+<tr><td style="text-align: center;" colspan="3">
+      <div onclick="window.location='<{$_basePath}><{$_templateGroupPrefix}>/supportpay/PurchasePage/Cancel';" class="rebutton rebuttonred"
+                style="display: inline-block;"><{$_language[cancel]}></div>
+    </td><td style="text-align: center;" colspan="3">
+      <div onclick="window.location='<{$_basePath}><{$_templateGroupPrefix}>/supportpay/MakeOrder/Index/<{$paydetails[FIRSTNAME]}>%20<{$paydetails[LASTNAME]}>';" class="rebutton rebuttongreen"
+                style="display: inline-block;"><{$_language[sp_paynow]}></div>
+      </a>
+    </td></tr></table></div>
+</td></tr></table>
+
+<{else}>
+  <table style="width: 100%;">
+    <tr><th>Status:</th><td><{$paydetails[ACK]}></tr>
+    <tr><th>Summary:</th><td><{$paydetails[L_SHORTMESSAGE0]}></tr>
+    <tr><th>Detail:</th><td><{$paydetails[L_LONGMESSAGE0]}></tr>
+
+    <tr><td colspan="2" style="text-align: center;">
+      <div onclick="window.location='<{$_basePath}><{$_templateGroupPrefix}>/supportpay/PurchasePage/Cancel';" class="rebutton rebuttonred"
+                style="display: inline-block;"><{$_language[cancel]}></div>
+    </td></tr>
+  </table>
+<{/if}>
+</div>]]>
+    </template>
+    <!-- END TEMPLATE: sp_reviewpay -->
+    <!-- BEGIN TEMPLATE: sp_dopay -->
+    <template name="sp_dopay" date="1346683732">
+      <![CDATA[<div align=center>
+<fieldset class='spfieldset' style='width: 90%'>
+<{if $transdetails != ''}>
+<legend><{$_language[sp_paydetails]}></legend>
+<!-- DO NOT REMOVE THIS LINE - it is required for WorldPay -->
+<{$transdetails}>
+</fieldset>
+<{/if}>
+</div>
+<p>
+  <{if $paydetails[PAYMENTSTATUS] == 'COMPLETED'}>
+Your purchase is complete - thank you!
+Any receipt emails sent will go to <{$paydetails[EMAIL]}>.
+<{if $paydetails[DEFERRED]}>
+</p>This is only an authorisation for a payment <em>up to</em> this amount. Full payment will not be taken until you next close a ticket.<p>
+<{/if}>
+
+  <{elseif $paydetails[PAYMENTSTATUS] == 'PENDING'}>
+Your purchase will be cleared as soon as the payment processor sends us approval.
+Any receipt emails sent will go to <{$paydetails[EMAIL]}>.
+  <{elseif $paydetails[PAYMENTSTATUS] == 'REFUSED'}>
+The payment was refused or cancelled. Please contact your card provider.
+  <{else}>
+Please contact the helpdesk to advise, quoting the transaction number above.
+  <{/if}>
+
+</p>
+      <div onclick="window.location='<{$_basePath}><{$_templateGroupPrefix}>/supportpay/ListPayments/Index';" class="rebutton"
+                style="display: inline-block; text-align: center;"><{$_language[widgethome]}></div>]]>
+    </template>
+    <!-- END TEMPLATE: sp_dopay -->
+    <!-- BEGIN TEMPLATE: sp_cardgather -->
+    <template name="sp_cardgather" date="1346683732">
+      <![CDATA[Please enter your credit or debit card details.
+<form name="ccard" action="<{$_basePath}><{$_templateGroupPrefix}>/supportpay/CardGather/Submit" method="POST">
+<table class="sp_carddets">
+<{foreach key=idx item=field from=$cardFields }>
+<{$field}>
+<{/foreach}>
+</table>
+<input type="submit" value="<{$_language[buttonsubmit]}>" class="rebuttonwide2" onclick="this.disabled=true; document.ccard.submit();"/>
+</form>]]>
+    </template>
+    <!-- END TEMPLATE: sp_cardgather -->
+    <!-- BEGIN TEMPLATE: sp_affiliate -->
+    <template name="sp_affiliate" date="1346683732">
+      <![CDATA[<script type="text/javascript">
+
+	function fnSelect(objId) {
+		fnDeSelect();
+		if (document.selection) {
+		var range = document.body.createTextRange();
+ 	        range.moveToElementText(document.getElementById(objId));
+		range.select();
+		}
+		else if (window.getSelection) {
+		var range = document.createRange();
+		range.selectNode(document.getElementById(objId));
+		window.getSelection().addRange(range);
+		}
+	}
+		
+	function fnDeSelect() {
+		if (document.selection) document.selection.empty(); 
+		else if (window.getSelection)
+                window.getSelection().removeAllRanges();
+	}
+	</script>
+
+<h2>Earn <{$_settings[general_companyname]}> credits!</h2>
+<p>With our <{$_language[sp_affiliate]}> system, you can earn credit every time one of your friends buys 
+<{if $_settings[sp_accept] == 1 || $_settings[sp_accept] == 3}><{$_settings[sp_minutestxt]}><{/if}>
+<{if $_settings[sp_accept] == 3}> or <{/if}>
+<{if $_settings[sp_accept] == 2 || $_settings[sp_accept] == 3}><{$_settings[sp_ticketstxt]}><{/if}>. You will automatically be given
+
+<{if $_settings[sp_accept] == 1 || $_settings[sp_accept] == 3}><{$_settings[sp_affminmult]}>% of their purchased <{$_settings[sp_minutestxt]}><{/if}>
+<{if $_settings[sp_accept] == 3}> and <{/if}>
+<{if $_settings[sp_accept] == 2 || $_settings[sp_accept] == 3}><{$_settings[sp_afftktmult]}>% of their purchased <{$_settings[sp_ticketstxt]}><{/if}>
+, completely <b>free of charge</b>!
+</p>
+<p>All you have to do is to use a special button which you can put on your own webpage and encourage your friends to sign up to <{$_settings[general_companyname]}>.
+</p>
+<p>Copy and paste this code into your own web pages to earn credit every time one of your friends buys <{$_settings[general_companyname]}> credits:</p>
+<pre id='affcode' style='width: 94%; border: 2px inset black; overflow: auto; margin-left: 3%; margin-right: 3%;
+			font-family: Lucidatypewriter, monospace;  
+			white-space: pre; padding: 1em;' onclick='fnSelect("affcode");'>
+<{$affcode}>
+</pre>
+<p>
+Here's what it will look like:
+<center><div style='border: solid 1px black; display: inline-block;'>
+<{$affraw}>
+</div></center>
+</p>]]>
+    </template>
+    <!-- END TEMPLATE: sp_affiliate -->
+    <!-- BEGIN TEMPLATE: sp_purchase -->
+    <template name="sp_purchase" date="1346683732">
+      <![CDATA[<script type="text/javascript">
+
+function showCost(count, each, tax) {
+  var display = document.getElementById("Cost");
+  var Taxdisplay = document.getElementById("Tax");
+  if (display) {
+    var cost = count * each;
+    if (cost < <{$minsale}>) {
+      display.innerHTML = '<span style="color: Red;"><{$currency}>'+cost.toFixed(2)+"</span>";
+    } else {
+      display.innerHTML = '<{$currency}>'+cost.toFixed(2);
+    }
+
+    if (Taxdisplay) {
+      cost = count * tax;
+      Taxdisplay.innerHTML = '<{$currency}>'+cost.toFixed(2);
+    }
+  }
+}
+
+</script>
+
+<form name="BuyStuff" id="BuyStuff" action="<{$_basePath}><{$_templateGroupPrefix}>/supportpay/PurchasePage/Item" method="POST">
+<input type="hidden" name="action" value=""/>
+<input type="hidden" name="thing" value="<{$saletype}>"/>
+
+From here you can buy more <{$thingLower}>.
+<{if ($thingMin > 0)}>
+  There is a minimum of <{$thingMin}>.
+<{/if}>
+<p>
+  <{$thingCaps}>: <input type="text" name="itemcount" id="multiple" value="<{$defItemCount}>" 
+            onchange="showCost(this.value,<{$unitprice}>,<{$unittax}>);"/>
+</p>
+
+<p>
+<b>Price: <span id="Cost"><{$currency}>0.00</span> <{if $discount > 0.0 }><em>(including <{$discount}>% discount)</em><{elseif $surcharge > 0.0 }><em>(including <{$surcharge}>% surcharge)</em><{/if}></b>
+<{if $unittax > 0}><em> (<span id="Tax"><{$currency}>0.00</span> Tax)</em><{/if}>
+
+<!-- Set an initial cost for the default number of minutes/tickets -->
+<script type="text/javascript">showCost(document.BuyStuff.multiple.value,<{$unitprice}>,<{$unittax}>);</script>
+</p>
+
+<{if ($saletype == "minutes" && $_settings[sp_authbuyenable])}>
+<table class="sp_buy_style">
+<tr><td class="widgetrowitem" style="display: table-cell;">
+<input type="radio" name="saletype" id="st_sale" value="sale" checked="checked"><label for="st_sale"><{$_language[sp_saletype_sale]}></label><p><{$_language[d_sp_saletype_sale]}></p></input>
+</td><td class="widgetrowitem" style="display: table-cell;">
+<input type="radio" name="saletype"  id="st_auth" value="auth"><label for="st_auth"><{$_language[sp_saletype_auth]}></label><p><{$_language[d_sp_saletype_auth]}></p></input>
+</td></tr></table>
+<{/if}>
+
+<div align="center">
+<table width="80%">
+  <tr>
+<{if $_settings[sp_gateway] == 1}>
+    <td width='50%'>
+      <a href='#' onclick="document.BuyStuff.action.value='PayPal'; document.BuyStuff.submit(); return true;">
+      <img src='<{$_themePath}>supportpay/PayPal.gif' border='0'/>
+      </a>
+    </td>
+<{/if}>
+    <td>
+      <a href='#' onclick="document.BuyStuff.action.value='Card'; document.BuyStuff.submit(); return true;">
+      <img src='<{$_themePath}>supportpay/CreditCards.gif' border='0'/>
+      </a>
+    </td>
+  </tr>
+</table>
+</div>
+</form>]]>
+    </template>
+    <!-- END TEMPLATE: sp_purchase -->
+    <!-- BEGIN TEMPLATE: sp_credit -->
+    <template name="sp_credit" date="1346683732">
+      <![CDATA[<div align='center'>
+<fieldset class='spfieldset' style='width: 40%'>
+<legend><{$_language[sp_ucredittitle]}></legend>
+
+<table border='0'>
+
+<{if ($dominutes)}>
+  <tr
+  <{if ($minutescdt < 0) }> style='color: Red;' <{/if}> >
+  <td style='text-align: right; font-weight: bold;'>
+    <{$minutescdt}>
+  </td><td><{if ($minutescdt == 1) }><{$_settings[sp_minutetxt]}><{else}><{$_settings[sp_minutestxt]}><{/if}>
+  </td></tr>
+<{/if}>
+
+<{if ($dotickets)}>
+  <tr
+  <{if ($ticketscdt < 0) }> style='color: Red;' <{/if}> >
+  <td style='text-align: right; font-weight: bold;'>
+    <{$ticketscdt}>
+  </td><td><{if ($ticketscdt == 1) }><{$_settings[sp_tickettxt]}><{else}><{$_settings[sp_ticketstxt]}><{/if}>
+  </td></tr>
+<{/if}>
+
+</table>
+
+<{if ($has_acctmgr) }>
+<hr/>
+<a href='<{$_basePath}><{$_templateGroupPrefix}>/supportpay/DepAccept/Remove' title='<{$_language[sp_remacctmgr]}>'><{$_language[sp_remacctmgr]}></a>
+<{/if}>
+
+</fieldset>
+</div>]]>
+    </template>
+    <!-- END TEMPLATE: sp_credit -->
+    <!-- BEGIN TEMPLATE: sp_buybuttons -->
+    <template name="sp_buybuttons" date="1346683732">
+      <![CDATA[<{if $_settings[sp_gateway] != 0 }>
+<{if ($discount < 100) }>
+  <div align="center" style="margin: 1em;">
+    <fieldset style="width: 66%" class="spfieldset">
+      <legend><{$_language[sp_buytitle]}></legend>
+<table width="100%" style='margin: 0px;'>
+  <tr>
+    <{if ($dominutes) }>
+      <td style="text-align: center; vertical-align: bottom;"><{$_language[sp_buymessage]}><br/>
+      <div onclick="window.location='<{$_basePath}><{$_templateGroupPrefix}>/supportpay/PurchasePage/Mins';" class="rebuttonwide2 sp_buybutton">
+<img src="<{$_themePath}>images/icon_creditcards.png"/><{$_settings[sp_minutestxt]}></div>
+      </td>
+    <{/if}>
+
+    <{if ($dotickets) }>
+      <td style="text-align: center; vertical-align: bottom;"><{$_language[sp_buymessage]}><br/>
+      <div onclick="window.location='<{$_basePath}><{$_templateGroupPrefix}>/supportpay/PurchasePage/Tkts';" class="rebuttonwide2 sp_buybutton">
+<img src="<{$_themePath}>images/icon_creditcards.png"/><{$_settings[sp_ticketstxt]}></div>
+      </td>
+    <{/if}>
+
+    <{if ($_settings[sp_usepackages]) }>
+      <td style="text-align: center; vertical-align: bottom;"><{$_language[sp_buymessage]}><br/>
+      <div onclick="window.location='<{$_basePath}><{$_templateGroupPrefix}>/supportpay/PurchasePage/Pkg';" class="rebuttonwide2 sp_buybutton">
+<img src="<{$_themePath}>images/icon_creditcards.png"/><{$_settings[sp_packagestxt]}></div>
+      </td>
+    <{/if}>
+  </tr>
+</table>
+</fieldset>
+</div>
+<{/if}>
+<{/if}>]]>
+    </template>
+    <!-- END TEMPLATE: sp_buybuttons -->
+    <!-- BEGIN TEMPLATE: sp_afflink -->
+    <template name="sp_afflink" date="1346683732">
+      <![CDATA[<{if ($_settings[sp_affiliate]) }>
+ <div style="text-align: center; margin: 1em;"><a href="<{$_basePath}><{$_templateGroupPrefix}>/supportpay/ShowAffiliate">Earn credits from your friends!</a></div>
+<{/if}>]]>
+    </template>
+    <!-- END TEMPLATE: sp_afflink -->
+    <!-- BEGIN TEMPLATE: sp_listpayments -->
+    <template name="sp_listpayments" date="1346683732">
+      <![CDATA[<{$gridcontents}>
+
+<table width="100%" class="tborder smalltext" style="margin: 6px 0px;">
+<tr><td class="row2" width="40%">
+  <form action="<{$_basePath}><{$_templateGroupPrefix}>/supportpay/Invoice/DateRange" method="post" target="Statement">
+<b><{$_language[sp_from_date]}>: </b><input type="text" id="fromdate" name="fromdate" value="<{$fromDate}>" class="swifttext" size="12" style='width: 12em;' readonly="1" />
+<script language="Javascript">datePickerDefaults.Format='<{$dateFormat}>'; QueueFunction(function(){ $("#fromdate").datepicker(datePickerDefaults); });</script>
+</td><td class="row2" width="40%">
+<b><{$_language[sp_to_date]}>: </b><input type="text" id="todate" name="todate" value="<{$toDate}>" class="swifttext" size="12" style='width: 12em;' readonly="1" /><script language="Javascript">datePickerDefaults.dateFormat='<{$dateFormat}>'; QueueFunction(function(){ $("#todate").datepicker(datePickerDefaults); });</script>
+</td><td class="row2"><input type="submit" value="<{$_language[sp_print]}>" class="rebutton"/>
+</td></tr></table>
+<em><{$oldpaymentwarning}></em>
+</form>
+<{RenderTemplate name="sp_buybuttons"}>
+<{RenderTemplate name="sp_afflink"}>]]>
+    </template>
+    <!-- END TEMPLATE: sp_listpayments -->
+    <!-- BEGIN TEMPLATE: sp_listdebits -->
+    <template name="sp_listdebits" date="1346683732">
+      <![CDATA[<{if ($OtherUser != "") }>
+<h2>Tickets for <{$OtherUser}></h2>
+<{/if}>
+
+<{$gridcontents}>
+
+<{RenderTemplate name="sp_buybuttons"}>
+<{RenderTemplate name="sp_afflink"}>]]>
+    </template>
+    <!-- END TEMPLATE: sp_listdebits -->
+    <!-- BEGIN TEMPLATE: sp_acctmanager -->
+    <template name="sp_acctmanager" date="1346683732">
+      <![CDATA[<{$gridcontents}>
+
+<hr/>
+<p>Use this to add new dependent users. They will receive an email with your name and a link which will add them to your account. After this, your credit will be used to pay for their tickets.</p>
+<p>The content of the email can not be edited, to prevent this facility being used to send spam.</p>
+<div style='margin: 1em; width: 100%;' align='center'>
+<{$adduserform}>
+</div>]]>
+    </template>
+    <!-- END TEMPLATE: sp_acctmanager -->
+    <!-- BEGIN TEMPLATE: sp_dependentemail -->
+    <template name="sp_dependentemail" date="1346683732">
+      <![CDATA[<{if ($ishtml) }>
+
+<html><body>
+<{$username}> has offered to pay for your expenses at <{$_settings[general_companyname]}>. If you would like to accept this offer,
+click on this link: <a href="<{$offerlink}>"><{$offerlink}></a> .
+</body></html>
+
+<{else}>
+
+<{$username}> has offered to pay for your expenses at <{$_settings[general_companyname]}>. If you would like to accept this offer,
+paste this link into your browser: <{$offerlink}> .
+
+<{/if}>]]>
+    </template>
+    <!-- END TEMPLATE: sp_dependentemail -->
+    <!-- BEGIN TEMPLATE: sp_depaccept -->
+    <template name="sp_depaccept" date="1346683732">
+      <![CDATA[<{if ($offermessage !== "") }>
+<p><{$offermessage}></p>
+<{/if}>
+
+<{if ($needAccept) }>
+<form method='post' action='<{$_basePath}><{$_templateGroupPrefix}>/supportpay/DepAccept/Index/<{$offerId}>'>
+<table border="0" width="100%"><tr><td width="50%" align="center"><input type='submit' name='accept' class="rebuttonwide2" value='<{$_language[sp_offeraccept]}>'/></td>
+<td width="50%" align="center"><input type='submit' name='reject' class="rebuttonwide2" value='<{$_language[sp_offerreject]}>'/></td>
+</tr></table>
+</form>
+<{/if}>]]>
+    </template>
+    <!-- END TEMPLATE: sp_depaccept -->
+    <!-- BEGIN TEMPLATE: sp_wpconfirm -->
+    <template name="sp_wpconfirm" date="1346683732">
+      <![CDATA[<style>
+  table.itemlist { border: inset 2px black; width: 100%; }
+  table.itemlist th { border-bottom: dashed 1px black; }
+  table.itemlist td { border-bottom: dashed 1px black; }
+  table.itemlist td.space { border: none; background-color: White; }
+  table.itemlist td.value { text-align: right; font-weight: bold; }
+  table.itemlist td.total { border-top: double 3px black; font-weight: bold; }
+</style>
+
+<h2><{$_language[sp_payreview]}></h2>
+<p><{$_language[sp_payreviewtext]}></p>
+
+<table class="itemlist">
+<th></th><th>Item</th><th>Number</th><th>Price</th></tr>
+<{foreach key=iidx value=item from=$items}>
+  <tr><td class="idx"><{$iidx}></td><td><{$item[name]}> <{$item[desc]}></td><td style='text-align: right;'><{$item[count]}> &times; <{$cursymbol}><{$item[cost]}></td>
+      <td class="price value"><{$cursymbol}><{$item[rowcost]}></td></tr>
+<{/foreach}>
+<{if $tax > 0}>
+<tr><td colspan="2" class="space"></td><td class="space value">Tax:</td><td class="space value" style='font-weight: bold;'><{$cursymbol}><{$tax}></td></tr>
+<{/if}>
+<tr><td colspan="3" class="space"></td><td class="total value"><{$cursymbol}><{$total}></td></tr>
+</table>
+
+<{$formstart}>
+<p align='right'>
+<input type="submit" class="swiftbutton" value="Make Payment"/>
+</p>
+</form>]]>
+    </template>
+    <!-- END TEMPLATE: sp_wpconfirm -->
+    <!-- BEGIN TEMPLATE: sp_remacctmgr -->
+    <template name="sp_remacctmgr" date="1346683732">
+      <![CDATA[<p><{$_language[sp_am_current]}> <{$am_name}>.</p>
+<p><{$_language[sp_am_willremove]}></p>
+<form method='post' action='<{$_basePath}><{$_templateGroupPrefix}>/supportpay/DepAccept/Remove'>
+<table border="0" width="100%">
+<tr><td width="50%" align="center"><input type='submit' name='yes' class="rebuttonwide2" value='<{$_language[yes]}>'/></td>
+<td width="50%" align="center"><input type='submit' name='no' class="rebuttonwide2" value='<{$_language[no]}>'/></td>
+</tr></table>
+</form>]]>
+    </template>
+    <!-- END TEMPLATE: sp_remacctmgr -->
+    <!-- BEGIN TEMPLATE: sp_cdtlanding -->
+    <template name="sp_cdtlanding" date="1346683732">
+      <![CDATA[<{RenderTemplate name="sp_buybuttons"}>
+<{RenderTemplate name="sp_afflink"}>]]>
+    </template>
+    <!-- END TEMPLATE: sp_cdtlanding -->
+    <!-- BEGIN TEMPLATE: sp_histlanding -->
+    <template name="sp_histlanding" date="1346683732">
+      <![CDATA[<table width="100%"  border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="50%">
+    <table cellspacing="3" cellpadding="1" width="100%" border="0">
+      <tr>
+        <td valign="top" width="15" nowrap>
+          <a href="<{$_baseName}><{$_templateGroupPrefix}>/supportpay/ListPayments">
+          <img src="<{$_themePath}>supportpay/payment-icon.png" border="0">
+          </a>
+        </td>
+        <td width="98%" align="left" valign="top">
+          <strong><a href="<{$_baseName}><{$_templateGroupPrefix}>/supportpay/ListPayments" id="moduletitle"><{$_language[sp_uw_viewpay]}></a></strong><br />
+          <span class="smalltext"><{$_language[d_sp_uw_viewpay]}></span>
+        </td>
+      </tr>
+    </table>
+  </td>
+    <td width="50%">
+    <table cellspacing="3" cellpadding="1" width="100%" border="0">
+      <tr>
+        <td valign="top" width="15" nowrap>
+          <a href="<{$_basePath}><{$_templateGroupPrefix}>/supportpay/ListDebits">
+          <img src="<{$_themePath}>../supportpay/debit-icon.png" border="0">
+          </a>
+        </td>
+        <td width="98%" align="left" valign="top">
+          <strong><a href="<{$_basePath}><{$_templateGroupPrefix}>/supportpay/ListDebits" id="moduletitle"><{$_language[sp_uw_viewbill]}></a></strong><br />
+          <span class="smalltext"><{$_language[d_sp_uw_viewbill]}></span>
+        </td>
+      </tr>
+    </table>
+  </td>
+</tr>
+</table>]]>
+    </template>
+    <!-- END TEMPLATE: sp_histlanding -->
+    <!-- BEGIN TEMPLATE: sp_css -->
+    <template name="sp_css" date="1346683732">
+      <![CDATA[<style type="text/css">
+.spfieldset { margin: 6px; color: #267DDC; 
+    -moz-border-radius: 4px; -webkit-border-radius: 4px; border-radius: 4px; padding: 4px;
+    border: 1px solid #c9cfd7; background: #fcfaf4; padding: 0.5em 1em; 
+    moz-box-shadow: 0.05em 0.05em 0.3em 0.01em #dedede; -webkit-box-shadow: 0.05em 0.05em 0.3em 0.01em #dedede;
+    box-shadow: 0.05em 0.05em 0.3em 0.01em #dedede;
+}
+.spfieldset, .spfieldset td, .spfieldset p, .spfieldset li { FONT: 11px Verdana, Tahoma; }
+
+.sp_row1 {	BACKGROUND-COLOR: #EDF4FF; }
+.sp_row2 {	BACKGROUND-COLOR: #F7FAFF; }
+
+.sp_rowunderline td { border-bottom: 1px dotted #888888; }
+.sp_rowunderline th { border-bottom: 2px solid #888888; }
+
+.sp_subamount { font-weight: bold; border-top: 1px solid #888888; padding: 0.5em 0em ; }
+.sp_billamount { font-weight: bold; border-top: 5px double #888888; padding: 1em 0em; vertical-align: middle;}
+.sp_subtotal { border-top: 1px solid #88888; text-align: right; padding: 0.5em 0em; }
+.sp_billtotal { border-top: 5px double #888888; padding: 1em 0em; vertical-align: middle; text-align: right;}
+
+.sp_pagebtns { display: table; font-size: smaller; background-color: white; border: 1px solid #EFE8DA; padding: 0.3em 0.5em;}
+.sp_pagebtns a { padding: 0.5em 0.5em; color: #333333;}
+.sp_pagebtns a:visited { padding: 0.5em 0.5em; color: #333333;}
+
+.sp_buybutton { display: inline-block; padding-bottom: 0; margin: 0.3em; text-transform: capitalize; font-size: 12px; padding-top: 10px;}
+.sp_buybutton img { border: none; vertical-align: middle; margin-right: 0.3em;}
+
+.sp_list_tab { border: none; cell-padding: 3px; cell-spacing: 1px; width: 100%; }
+
+.sptitlecredit { font-size: 12px; text-align: center;
+    -moz-border-radius: 4px; -webkit-border-radius: 4px; border-radius: 4px; padding: 4px;
+    border: 1px solid #c9cfd7; background: #fcfaf4; padding: 0.8em 0.3em; 
+    moz-box-shadow: 0.05em 0.05em 0.3em 0.01em #dedede inset; -webkit-box-shadow: 0.05em 0.05em 0.3em 0.01em #dedede inset;
+    box-shadow: 0.05em 0.05em 0.3em 0.01em #dedede inset;
+}
+
+.sp_buy_style { width: 100%; padding: 0 10%; border: none;}
+.sp_buy_style td { width: 50%; vertical-align: top;}
+.sp_buy_style p { font-style: italic; color: #666666; }
+
+table.sp_carddets { border: dashed 1px black; margin: 1em 0em;}
+.sp_carddets th { text-align: right; font-variant: small-caps; padding-right: 0.5em; }
+.sp_carddets input { width: 20em; }
+
+.sp_cred_pos { }
+.sp_cred_neg { color: Red; }
+
+.sp_listctrlbox { width: 100%; text-align: right; margin-bottom: 0.5em; }
+
+</style>]]>
+    </template>
+    <!-- END TEMPLATE: sp_css -->
+    <!-- BEGIN TEMPLATE: sp_header -->
+    <template name="sp_header" date="1346683732">
+      <![CDATA[<{RenderTemplate name="sp_css"}>
+<div class="boxcontainer"><div class="boxcontainerlabel"><{$_spPageTitle}></div>
+<div class="boxcontainercontent">]]>
+    </template>
+    <!-- END TEMPLATE: sp_header -->
+    <!-- BEGIN TEMPLATE: sp_footer -->
+    <template name="sp_footer" date="1346683732"><![CDATA[</div></div>]]></template>
+    <!-- END TEMPLATE: sp_footer -->
+    <!-- BEGIN TEMPLATE: sp_purchase_pkg -->
+    <template name="sp_purchase_pkg" date="1346683732">
+      <![CDATA[<{RenderTemplate name="sp_css"}>
+<form name="BuyStuff" id="BuyStuff" action="<{$_baseName}><{$_templateGroupPrefix}>/supportpay/PurchasePage/Item" method="POST">
+<div style='overflow: auto; width: 98%; height:25em; margin: 1em 0px; border: inset 2px black;' >
+<{foreach key=pkgid item=pkginfo from=$packagelist}>
+ <table id='pkg<{$pkginfo[pkgid]}>' style='border: dotted 1px black; width: 96%; margin: 2%;'>
+    <tr>
+      <{if ($pkginfo[img_url] != "") }>
+      <td style='width: 80px; height: 64px; border: solid 1px Gray; background-color: Gray;'>
+        <img style='width: 80px; height: 64px; border: 0;' src='<{$pkginfo[img_url]}>' title='<{$pkginfo[title]}>'>
+      </td>
+      <{/if}>
+      <td style='vertical-align: top; height: 64px;'>
+        <span style='font-weight: bold; font-variant: small-caps;'><{$pkginfo[title]}></span><br/>
+	<span style='font-size: 80%; font-weight: normal; color: #444444;'><{$pkginfo[description]}></span><br/>
+	<span style='font-weight: bold; font-size: 120%;'><{$currency}><{$pkginfo[price]}></span><br/>
+      </td>
+      <td><input type="text" value="0" name="pkgcnt[<{$pkginfo[pkgid]}>]" id="pkgcnt_<{$pkgid}>"></td>
+    </tr>
+  </table>
+<{/foreach}>
+</div>
+<input type="hidden" name="action" value=""/>
+
+<div align="center">
+<table width="80%">
+  <tr>
+<{if $_settings[sp_gateway] == 1}>
+    <td width='50%'>
+      <a href='#' onclick="document.BuyStuff.action.value='PayPal'; document.BuyStuff.submit(); return true;">
+      <img src='<{$_themePath}>supportpay/PayPal.gif' border='0'/>
+      </a>
+    </td>
+<{/if}>
+    <td>
+      <a href='#' onclick="document.BuyStuff.action.value='Card'; document.BuyStuff.submit(); return true;">
+      <img src='<{$_themePath}>supportpay/CreditCards.gif' border='0'/>
+      </a>
+    </td>
+  </tr>
+</table>
+</div>
+
+</form>]]>
+    </template>
+    <!-- END TEMPLATE: sp_purchase_pkg -->
+    <!-- BEGIN TEMPLATE: sp_email_invoice -->
+    <template name="sp_email_invoice" date="1346683733">
+      <![CDATA[<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+    <title><{$companyname}> <{$_language[sp_invoicetitle]}></title>
+    <link rel="StyleSheet" href="<{$_themePath}>../supportpay/Invoice.css" type="text/css" />
+<style>
+@media print { div.non-printable { display: none; } }
+.ticketname { color: #333333; font-style:italic; text-align: left;}
+</style>
+</head>
+<body>
+<div width="100%" class="non-printable">
+<form><input type="button" name="print"  value="Print" onClick="javascript: window.print();"></form>
+</div>
+<img src="<{$headerImage}>" class="logo"/>
+    <div class="addressbox">
+    <table border="0" width="100%">
+      <tr><td class="addresshdr">Account:</td><td class="addressval"><{$username}></td></tr>
+      <{foreach key=fname value=fvalue from=$customfields}>
+        <{if ($fname != "AffiliateID") }>
+        <tr><td class="addresshdr"><{$fname}>:</td><td class="addressval"><{$fvalue}></td></tr>
+        <{/if}>
+      <{/foreach}>
+    </table>
+    </div>
+    <h1><{$_language[sp_invoicetitle]}></h1>
+    <p><b>Date:</b>&nbsp;<{$dateofinvoice}>, covering <{$startdate}> to <{$enddate}></p>
+    <p><b><{$companyname}></b> (<{$_basePath}>)</p><hr />
+    <!-- Invoice list -->
+    <div align="center">
+    <table class="items">
+        <tr>
+            <th>Date</th>
+<{if $dotickets == true}><th>Tickets</th><{/if}>
+<{if $dominutes == true}><th>Minutes</th><{/if}>
+<th>Comments</th><th>Tax</th><th>Cost</th>
+        </tr>
+    <{foreach key=_inum item=_item from=$transactions}>
+        <tr>
+            <td class="main"><{$_item[created]}></td>
+               <{if $_item[pending]}><td colspan="2">Pending</td>
+            <{else}>
+               <{if $dotickets == true}><td class="main"><{$_item[tickets]}></td><{/if}>
+               <{if $dominutes == true}><td class="main"><{$_item[minutes]}></td><{/if}>
+            <{/if}>
+            <td class="main"><{$_item[comments]}><{if $_item[title] != ""}><br/><span class='ticketname'><{$_item[title]}></span><{/if}>
+            </td>
+            <td class="main"><{$_item[currency]}><{$_item[tax]}></td>
+            <td class="main"><{$_item[currency]}><{$_item[cost]}></td>
+        </tr>
+    <{/foreach}>
+<tr>
+  <td class="final">Period Total</td>
+  <{if $dotickets == true}><td class="final"><{$tkt_total}></td><{/if}>
+  <{if $dominutes == true}><td class="final"><{$min_total}></td><{/if}>
+  <td colspan="3" class="final"></td>
+</tr>
+<tr>
+  <td class="final">Current Balance</td>
+  <{if $dotickets == true}><td class="final" style="<{if $tkt_current < 0}>color: red;<{/if}>"><{$tkt_current}></td><{/if}>
+  <{if $dominutes == true}><td class="final" style="<{if $min_current < 0}>color: red;<{/if}>"><{$min_current}></td><{/if}>
+  <td colspan="3" class="final"></td>
+</tr>
+<tr>
+  <{if $dotickets == true}><td class="final"></td><{/if}>
+  <{if $dominutes == true}><td class="final"></td><{/if}>
+  <td colspan="4" class="final"></td>
+</tr>
+<{foreach key=_inum item=item from=$pay_totals}>
+  <tr>
+    <{if $dotickets == true}><td></td><{/if}>
+    <{if $dominutes == true}><td></td><{/if}>
+    <td colspan="2" align="right"><b><{$_inum}></b></td>
+    <td class="sumvalue"><{$tax_totals[$_inum]}></td>
+    <td class="sumvalue"><{$item}></td>
+  </tr>
+<{/foreach}>
+
+<tr>
+    <{if $dotickets == true}><td></td><{/if}>
+    <{if $dominutes == true}><td></td><{/if}>
+    <td colspan="2"></td>
+<td colspan="2" class="sumline">&nbsp;</td>
+</tr>
+    </table>
+    </div>
+    <hr />
+<div class="Footer"><{$footer}></div>
+</body>
+</html>]]>
+    </template>
+    <!-- END TEMPLATE: sp_email_invoice -->
+    <!-- BEGIN TEMPLATE: sp_pay_error -->
+    <template name="sp_pay_error" date="1346683732">
+      <![CDATA[<p><{$_language[sp_payerror_topmessage]}></p>
+<fieldset class='spfieldset' style='width: 90%'>
+<legend><{$_language[sp_payerror_details]}></legend>
+<{$errordetails}>
+</fieldset>
+<p><{$error_basemessage}></p>
+<form method="POST" action="<{$_basePath}><{$_templateGroupPrefix}>">
+<input type="submit" value="<{$_language[widgethome]}>" class="rebuttonwide2"/>
+</form>]]>
+    </template>
+    <!-- END TEMPLATE: sp_pay_error -->
+    <!-- BEGIN TEMPLATE: sp_credit_email -->
+    <template name="sp_credit_email" date="1346683732">
+      <![CDATA[Dear <{$_username}>,
+
+Your account with <{$_settings[general_companyname]}> has been updated. Your credit has changed from <{if $_settings[sp_accept] != 2}><{$_oldcredit[minutes]}> <{$_settings[sp_minutestxt]}><{/if}><{if $_settings[sp_accept] == 3}> and <{/if}><{if $_settings[sp_accept] != 1}><{$_oldcredit[tickets]}> <{$_settings[sp_ticketstxt]}><{/if}> to <{if $settings[sp_accept] != 2}><{$_newcredit[minutes]}> <{$_settings[sp_minutestxt]}><{/if}><{if $_settings[sp_accept] == 3}> and <{/if}><{if $_settings[sp_accept] != 1}><{$_newcredit[tickets]}> <{$_settings[sp_ticketstxt]}><{/if}>. This is for the following reason:
+
+<{$_changereason}>
+
+Regards,
+Administrator]]>
+    </template>
+    <!-- END TEMPLATE: sp_credit_email -->
+    <!-- BEGIN TEMPLATE: sp_listagreements -->
+    <template name="sp_listagreements" date="1346683732">
+      <![CDATA[<{$gridcontents}>
+
+<{if $_settings[sp_gateway] != 0 }>
+<{if ($discount < 100) }>
+  <div align="center" style="margin: 1em;">
+    <fieldset style="width: 66%" class="spfieldset">
+      <legend><{$_language[sp_buytitle]}></legend>
+<table width="100%" style='margin: 0px;'>
+  <tr>
+    <{if ($_settings[sp_usepackages]) }>
+      <td style="text-align: center; vertical-align: bottom;"><{$_language[sp_addaggmessage]}><br/>
+      <div onclick="window.location='<{$_basePath}><{$_templateGroupPrefix}>/supportpay/PurchasePage/Recur';" class="rebuttonwide2 sp_buybutton">
+<img src="<{$_themePath}>images/icon_creditcards.png"/><{$_settings[sp_agreementstxt]}></div>
+      </td>
+    <{/if}>
+  </tr>
+</table>
+</fieldset>
+</div>
+<{/if}>
+<{/if}>]]>
+    </template>
+    <!-- END TEMPLATE: sp_listagreements -->
+    <!-- BEGIN TEMPLATE: sp_listagreements -->
+    <template name="sp_pleaseaddcredit" date="1346683732">
+      <![CDATA[<html><body>
+<p>Dear <{$_username}>,</p>
+
+<p>You recently posted a ticket to the <{$_reqMinutes[title]}> department of <{$_settings[general_companyname]}>. This is a premium department, and unfortunately you don't have enough credit to post.
+</p>
+
+<p>
+You currently have <{if $_acceptMins}><{$_credit[minutes]}> <{$_settings[sp_minutestxt]}><{if $_acceptTkts}> and<{/if}><{/if}> <{if $_acceptTkts}><{$_credit[tickets]}> <{$_settings[sp_ticketstxt]}> <{/if}>credit, and this department requires a minimum of <{$_reqMinutes[mins_to_post]}> <{$_settings[sp_minutestxt]}><{if $_acceptTkts}><{if $_acceptMins}> or<{/if}> 1 <{$_settings[sp_tickettxt]}><{/if}>.
+</p>
+
+<p>
+Please visit <{$_basePath}>/supportpay/CdtLanding/Main to add more credit to your account. You don't need to re-post your ticket, it will be sent on as soon as enough credit is available.
+</p>
+
+<p>Regards,<br/>
+The <{$_settings[general_companyname]}> team.
+</p>
+</body></html>]]>
+    </template>
+      </category>
+</swifttemplate>

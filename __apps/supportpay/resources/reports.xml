@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SPReports>
+<Report>
+<hash><![CDATA[6ce00b5cdc390ecd25c8aa2c253ef199]]></hash>
+<title><![CDATA[New Clients]]></title>
+<query><![CDATA[fullname as Name,date_format(from_unixtime(dateline),'%D %M, %Y') as Joined from {prefix}users u WHERE dateline BETWEEN {fromdate} AND {todate}]]></query>
+<countsql><![CDATA[{prefix}users u WHERE dateline BETWEEN {fromdate} AND {todate}]]></countsql>
+</Report>
+<Report>
+<hash><![CDATA[6fbbdfcd7b8d4f02f9cb9b308ec3b2a0]]></hash>
+<title><![CDATA[Credit Summary]]></title>
+<query><![CDATA[u.fullname, ue.email, coalesce(su.minutes,0) as 'Minutes', 
+  coalesce(su.tickets,0) as 'Tickets' 
+FROM {prefix}users as u left join {prefix}sp_users as su on (su.userid = u.userid),
+{prefix}useremails as ue
+where ue.linktypeid = u.userid]]></query>
+<countsql><![CDATA[{prefix}users]]></countsql>
+</Report>
+<Report>
+<hash><![CDATA[ada24b1467687814d8545ebbd3c7fb64]]></hash>
+<title><![CDATA[Purchase Summary]]></title>
+<query><![CDATA[sum(if(minutes > 0,minutes,0)) as 'Bought Minutes',sum(if (tickets > 0,tickets,0)) as 'Bought Tickets',
+sum(if(minutes < 0,-minutes,0)) as 'Used Minutes',sum(if (tickets < 0,-tickets,0)) as 'Used Tickets',
+concat(currency,' ',format(sum(up.cost),2) COLLATE utf8_general_ci) as 'Spent' 
+from (select * from {prefix}sp_user_payments 
+WHERE created BETWEEN {fromdate} AND {todate} 
+union select * from {prefix}sp_user_payments_old 
+WHERE created BETWEEN {fromdate} AND {todate}) as up
+group by currency]]></query>
+<countsql><![CDATA[(select distinct currency from {prefix}sp_user_payments 
+WHERE created BETWEEN {fromdate} AND {todate} 
+union
+select distinct currency from {prefix}sp_user_payments_old
+WHERE created BETWEEN {fromdate} AND {todate} 
+) t
+]]></countsql>
+</Report>
+<Report>
+<hash><![CDATA[283eb94235625b59b07ecc25f80e970e]]></hash>
+<title><![CDATA[Clients with Discount]]></title>
+<query><![CDATA[fullname as 'Name',discount from {prefix}users u, {prefix}sp_users sp
+WHERE discount > 0 AND sp.userid = u.userid]]></query>
+<countsql><![CDATA[{prefix}sp_users WHERE discount > 0]]></countsql>
+</Report>
+<Report>
+<hash><![CDATA[462ba62c90e647dae13e675a4324abd1]]></hash>
+<title><![CDATA[Licensed Staff]]></title>
+<query><![CDATA[s.fullname, sum(tktcnt) as 'Tickets', sum(cocnt) as 'Live Support' from (
+	select staffid,count(1) as cocnt, 0 as tktcnt
+	  from {prefix}chatobjects co
+	 where chatobjectid in (select ticketid from {prefix}sp_ticket_paid tp
+		 where (tp.migrated = 0 or (tp.migrated is null and co.departmentid in (
+		    select departmentid from {prefix}sp_departments)))
+		   and tp.paytype = 2
+		   and tp.paid_date between unix_timestamp(date_sub(now(), interval 1 month)) and unix_timestamp(now()))
+	 group by staffid
+union
+	select workerstaffid as staffid, 0 as cocnt, count(distinct t.ticketid) as tktcnt
+	  from {prefix}tickets t, {prefix}tickettimetracks tt
+	 where tt.ticketid = t.ticketid and t.ticketid in (select ticketid from {prefix}sp_ticket_paid tp
+		 where (tp.migrated = 0 or (tp.migrated is null and t.departmentid in (
+		    select departmentid from {prefix}sp_departments)))
+		   and tp.paytype = 1
+		   and tp.paid_date between unix_timestamp(date_sub(now(), interval 1 month)) and unix_timestamp(now()))
+   group by workerstaffid
+) total, {prefix}staff s
+where s.staffid = total.staffid
+group by s.fullname]]></query>
+<countsql><![CDATA[(
+	select staffid,count(1) as cocnt, 0 as tktcnt
+	  from {prefix}chatobjects co
+	 where chatobjectid in (select ticketid from {prefix}sp_ticket_paid tp
+		 where (tp.migrated = 0 or (tp.migrated is null and co.departmentid in (
+		    select departmentid from {prefix}sp_departments)))
+		   and tp.paytype = 2
+		   and tp.paid_date between unix_timestamp(date_sub(now(), interval 1 month)) and unix_timestamp(now()))
+	 group by staffid
+union
+	select workerstaffid as staffid, 0 as cocnt, count(distinct t.ticketid) as tktcnt
+	  from {prefix}tickets t, {prefix}tickettimetracks tt
+	 where tt.ticketid = t.ticketid and t.ticketid in (select ticketid from {prefix}sp_ticket_paid tp
+		 where (tp.migrated = 0 or (tp.migrated is null and t.departmentid in (select departmentid from {prefix}sp_departments)))
+		   and tp.paytype = 1
+		   and tp.paid_date between unix_timestamp(date_sub(now(), interval 1 month)) and unix_timestamp(now()))
+   group by workerstaffid
+) total, {prefix}staff s
+where s.staffid = total.staffid
+group by s.fullname]]></countsql>
+</Report>
+</SPReports>

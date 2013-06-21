@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<!-- Remember to change config/config.xml to match! -->
+<Update version="1.0.3424" url="https://www.support-pay.com/downloads/SupportPay_Fusion.zip">- Fix problem where edits to billable time were not picked up until ticket status changed.
+- Allow packages to be limited to one (or more) template groups
+- Add "Payments" tab to Tickets page, showing user credit deductions for this specific ticket.
+- Options to control frequency of credit-change emails.
+- Warning email to org account manager when org falls below X number of minutes or tickets
+- Payment is taken immediately if a ticket is closed and then re-opened, and more billing items added.
+- From the Chat Review page from Pay Live Support, allow the department to be changed.
+- When calculating available credit including still-open tickets, take account of open tickets belonging to other members of the user's organisation.
+- Add explicit instructions on setting up WHMCS to the manual
+- User accounts in Fusion which no longer map to WHMCS accounts are remaining mapped.
+- If an organization manager's account is completely deleted, they were still recorded as being the payer for other members of the organization.
+- Add the "hours" value into the WHMCS billable item calls.
+- Replace "CreditCards.gif" with one without the PayPal branding
+- Add support for WHMCS "subaccounts"
+- Was creating account-payment details during import from WHMCS even when this was not licensed.
+- WHMCS user import should only set the Organisation when using Fusion organisations
+- When importing users from WHMCS, ensure that if a user is the first to be added to an organisation then they become the organisation manager automatically.
+- Show a visible warning in the staff Tickets page if there's a problem with the license
+- Billing entries could be missed if the server time changed and the ticket was closed more than 15 minutes later without having any more billable time added
+- Bugfix for access to swchatobjects when generating invoices on Resolve.
+- Workaround for a bug in Kayako Database support with multiple connections
+- Don't check the organizations setting when importing users and orgs from WHMCS.
+- Incorrect billing sent to WHMCS for organisation managers
+- Fix for a possible problem when submitting Website Payment Pro credit card payments with certain combinations of tax and item value
+- Data in WHMCS which was only white-space could prevent users being imported.
+- Correct error message if HTTP_HOST is filtered out by Apache or a Proxy server
+- Module version/upgrade checks - still referring to "moduleversion" on 4.50 and higher.
+- Warn about missing ionCube loaders during installation.
+- Workaround for a bug in MySQL 5.5.28 where it's unable to subtract two unsigned numbers if the result is negative
+- Show department on Pay Live Support page.
+- Compatibility with Kayako V4.50 upwards
+- Add a ticket audit log entry when sending email for purchase credit.
+- NEW: Add record to ticket Audit Log when "insufficient credit" email is sent.
+- FIX: Change template for "please add credit" email to avoid bug in SWIFT_Mailer where emails can be truncated.
+- FIX: Some pre-authorised transactions could revert to the original value after being claimed.
+- FIX: Adding credits to an org manager then moving to a different page results in an error.
+- FIX: Error was reported incorrectly when changing an organisation owner.
+- NEW: Allow "Agreements" buton to be hidden.
+- FIX: Was calculating the wrong price for packages with fractional prices
+- FIX: Credit display in the tickets tab was showing in red only if credit was precisely 0, not for 0 or less.
+- NEW: Pre-approval system for emails or posts to chargeable departments when insufficient credit exists.
+- FIX: When buying multiples of a single package, incorrect credit was added.
+- NEW: Option to redirect client to URL (i.e. payment page) if they post without enough credit
+- FIX: Pre-authorized payments not being captured if older, pre-paid credit existed
+- NEW: Add support for Authorize.net as a payment gateway
+- FIX: Allow managers to be selected when all members of an organisation are managers
+- NEW: Optionally redirect ticket posts requests to the purchase page, where the client has insuffiicient credit to post.
+- FIX: For WHMCS SendSingleTicket invoicing, create a visible history entry in SupportPay to show that it's been sent to WHMCS.
+- FIX: "needUpdate not defined" error in whmcs integration when a user does not exist.
+- FIX: Set default PayPal IPN URL on installation.
+- FIX: Members added to organisations retrospectively were not picked up automatically
+- NEW: Highlight credit on the tickets page where credit is 0 for chargeable departments
+- FIX: Display bug in Unpaid Tickets page where tickets from non-billable departments were shown
+- NEW: Support HTTP authentication for WHMCS API connections
+- NEW: Add an option to make Billable Time required, in addition to existing option to pre-populate it.
+- FIX: Continue if credit-change emails are unable to be sent due to non-existent template groups
+- NEW: Add ability to test WHMCS connection from Settings page
+- NEW: Staff Add Credit page now includes disabled packages
+- FIX: Upgraded but unpaid orders in WHMCS were not being processed correctly
+- Reduce displayed errors in the case of damaged WHMCS records
+- NEW: Add extra option for auto-adding billable time; can now specify to add time only after a number of staff replies
+- NEW: Show credit more prominently in the Tickets page
+- FIX: WHMCS packages with no associated invoices should use the package status to determine whether they're active or not
+- FIX: Problems with payment screens with PHP output buffering switched off
+- FIX: User was not restricted in posting to chargeable departments if a template group was specified
+- Chargeable departments not being mapped correctly during migration from V3 to V4
+- FIX: WHMCS users never had the organistion value updated in some cases
+- FIX: Error when creating a user based on an WHMCS user is handled incorrectly
+- Update WHMCS sales queries to not show package info for non-existent users
+- FIX: Free/one-off packages not being picked up correctly from WHMCS
+- NEW: Add support for perpetual licensing model
+- FIX: Warning when calling cron - output starts before header.
+- NEW: Allow SupportPay to work on multiple domains from one license
+- NEW: Add version checking on WHMCS API commands
+- NEW: Set Organisation from WHMCS with every login, not just at first login
+
+- Release (2801)
+- FIX: Multi-page results in Unpaid Tickets page not being shown correctly
+- NEW: Add support for single-payment and free packages imported from WHMCS
+- FIX: Handling WHMCS users with no email address
+- FIX: Incorrect URL in client Affiliates page
+- FIX: Incorrect results in Unpaid Tickets page
+- FIX: Workaround for PHP problems in Windows
+- NEW: Invoices can be manually re-sent by staff
+- NEW: New accounts get the system default overdraft, if defined
+- NEW: Pass many errors to Kayako Admin console as well as PHP error log
+- NEW: Allow department-level rules to be set for private departments as well as public ones
+- FIX: Deleting packages was broken
+- FIX: Client-side submit filters not using department-level rules
+
+- Release (2700)
+- NEW: Ability to limit departments to accepting only minute or ticket payments
+- FIX: Misleading error message in error log during payment
+- NEW: Support for native Kayako Organisations instead of master/dependent
+- NEW: Performance improvements for sites with large numbers of users
+- NEW: Javascript error fixed in staff Add Payment screen
+- FIX: Cron now matches Live Support users to their accounts - was previously happening only in Pay Live Support page
+
+- Release (2661)
+- NEW: Add ability to show client credit on Tickets page directly
+- FIX: Display problems when more than one page of search results is returned
+- FIX: Credit displayed in Staff screens when Account Management is disabled
+- NEW: Add support for WHMCS integration
+- NEW: Changes to help integration with highly-customised sites
+- FIX: Problem with purchasing for Fusion V4.01.240
+- FIX: Workaround for Kayako bug SWIFT-974
+- NEW: Allow new widgets to work better with heavily customised sites
+- NEW: New security setting - "Can Set Overdraft"
+- FIX: Manually adjusting billable time on Live Support
+- Workaround for bug in Kayako installation system
+- NEW: Startup packages can be assigned to individual user groups
+- NEW: Allow negative discounts (i.e. surcharges) for clients
+- FIX: Hide purchase buttons from clients with 100% discount
+- FIX: Date format on customer invoices corrected
+- NEW: Support for recurring payments added
+- NEW: Option to send emails to clients when their credit changes
+- NEW: Staff can manage client dependents manually
+- NEW: Staff can manage client affiliates manually
+- FIX: Bug in staff "User Credit" page when searching
+- NEW: PayPal Website Payments Pro supported
+- FIX: Fixes for affiliate pages on client side
+- NEW: Staff can manually add packages to user credit
+- FIX: Formatting corrected in client-side list views
+- NEW: Client screens show credit if it exists, even if credit would normally be hidden
+- Fixes for TicketPay import
+- FIX: Expired pre-auth payments are correctly removed
+- NEW: Allow departments to have individual billing rates
+
+- Release (2442)
+</Update>

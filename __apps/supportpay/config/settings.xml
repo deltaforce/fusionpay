@@ -1,0 +1,595 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<swiftsettings>
+  <group name="settings_supportpay" module="supportpay" app="supportpay" ishidden="1">
+    <setting name="sp_whmcs_lastpush" type="number" >
+      <defaultvalue>0</defaultvalue>
+    </setting>
+  </group>
+
+    <group name="settings_supportpay" module="supportpay"  app="supportpay" ishidden="0">
+    <setting name="sp_version" type="custom" >
+      <defaultvalue>0</defaultvalue>
+      <customcode>
+        <![CDATA[<?php 
+$_SWIFT = SWIFT::GetInstance();
+if (method_exists($_SWIFT->Language, "LoadModule")) {
+	$_SWIFT->Language->LoadModule(SWIFT_LanguageEngine::DEFAULT_LOCALE, "supportpay");
+  $sp_version = $this->Module->GetInstalledVersion("supportpay");
+} else {
+	$_SWIFT->Language->LoadApp(SWIFT_LanguageEngine::DEFAULT_LOCALE, "supportpay");
+  $sp_version = $this->App->GetInstalledVersion("supportpay");
+}
+global $SPFunctions;
+SWIFT_Loader::LoadLibrary('SupportPay:SPFunctions', "supportpay");
+$SPFunctions->encryptAllPasswords();
+echo '<input name="sp_version" value="'.$_SWIFT->Settings->getKey("settings","sp_version").'" type="hidden"/>';
+echo $sp_version;
+?>]]>
+      </customcode>
+    </setting>
+    <setting name="sp_debug" type="yesno">
+      <defaultvalue>0</defaultvalue>
+    </setting>
+    <setting name="sp_allowupdatecheck" type="yesno">
+      <defaultvalue>1</defaultvalue>
+    </setting>
+    <setting name="sp_erroremail" type="text" >
+      <defaultvalue></defaultvalue>
+    </setting>
+    <setting name="sp_widgetstyle" type="custom">
+      <customcode>
+        <![CDATA[
+<select name="sp_widgetstyle" class="swiftselect">
+<?php global $SPFunctions; $SPFunctions->genWidgetSelect(); ?>
+</select>
+]]>
+      </customcode>
+      <defaultvalue>0</defaultvalue>
+    </setting>
+    <setting name="sp_statusclosed" type="custom">
+      <customcode>
+        <![CDATA[
+<select name="sp_statusclosed" class="swiftselect">
+<?php global $SPFunctions; $SPFunctions->genStatusSelect(); ?>
+</select>
+]]>
+      </customcode>
+      <defaultvalue>3</defaultvalue>
+    </setting>
+    <setting name="sps_wording" type="title" />
+    <setting name="sp_minutetxt" type="custom" >
+      <defaultvalue>minute</defaultvalue>
+      <customcode>
+        <![CDATA[
+<script type="text/javascript">
+// Hack for a Firefox bug where radio buttons don't get checked correctly.
+//document.swiftform.autocomplete='off';
+</script>
+<?php
+echo '
+<input class="swifttext" name="sp_minutetxt" value="'.$_SWIFT->Settings->getKey("settings","sp_minutetxt").'" size="30" type="text">';
+?>
+        ]]>
+      </customcode>
+    </setting>
+    <setting name="sp_minutestxt" type="text" >
+      <defaultvalue>minutes</defaultvalue>
+    </setting>
+    <setting name="sp_tickettxt" type="text" >
+      <defaultvalue>ticket</defaultvalue>
+    </setting>
+    <setting name="sp_ticketstxt" type="text" >
+      <defaultvalue>tickets</defaultvalue>
+    </setting>
+    <setting name="sp_packagetxt" type="text" >
+      <defaultvalue>package</defaultvalue>
+    </setting>
+    <setting name="sp_packagestxt" type="text" >
+      <defaultvalue>packages</defaultvalue>
+    </setting>
+    <setting name="sp_agreementstxt" type="text" >
+      <defaultvalue>Agreement</defaultvalue>
+    </setting>
+    
+    <!-- Global payment stuff -->
+    <setting name="sps_payment" type="title" />
+    <setting name="sp_gateway" type="custom" >
+      <!-- numbers here to correspond with SP_PROCESSOR values in sp_functions.php -->
+      <defaultvalue>1</defaultvalue>
+      <customcode>
+        <![CDATA[<select name="sp_gateway" class="swiftselect">
+<?php
+global $SPFunctions; echo $SPFunctions->getCardProcList($_SWIFT->Settings->getKey("settings","sp_gateway"));
+?>
+</select>]]>
+      </customcode>
+    </setting>
+    <setting name="sp_currency" type="custom">
+      <defaultvalue>GBP</defaultvalue>
+      <customcode>
+        <![CDATA[
+<select name="sp_currency" class="swiftselect">
+<?php
+global $sp_currencylist;
+foreach ($sp_currencylist as $unit => $cdetails) {
+  echo "<option value='".$unit."' ".($unit == $_SWIFT->Settings->getKey("settings","sp_currency") ? "selected":"").
+  ">".$cdetails["name"]."</option>";
+}
+?>
+			</select>
+        ]]>
+      </customcode>
+    </setting>
+    <setting name="sp_accept" type="custom" >
+      <defaultvalue>3</defaultvalue>
+      <customcode>
+        <![CDATA[
+<select name="sp_accept" class="swiftselect">
+<?php
+echo "<option value='1' " .($_SWIFT->Settings->getKey("settings","sp_accept") == 1 ? "selected":"").">".$_SWIFT->Language->Get("sp_accept_minutes")."</option>\n";
+echo "<option value='2' " .($_SWIFT->Settings->getKey("settings","sp_accept") == 2 ? "selected":"").">".$_SWIFT->Language->Get("sp_accept_tickets")."</option>\n";
+echo "<option value='3' " .($_SWIFT->Settings->getKey("settings","sp_accept") == 3 ? "selected":"").">".$_SWIFT->Language->Get("sp_accept_both")."</option>\n";
+?>
+</select>
+        ]]>
+      </customcode>
+    </setting>
+    <setting name="sp_taxrate" type="number" >
+      <defaultvalue>0</defaultvalue>
+    </setting>
+    <setting name="sp_reversetax" type="yesno">
+      <defaultvalue>1</defaultvalue>
+    </setting>
+    <setting name="sp_minmin" type="number" >
+      <defaultvalue>15</defaultvalue>
+    </setting>
+    <setting name="sp_mintkt" type="number" >
+      <defaultvalue>5</defaultvalue>
+    </setting>
+    <setting name="sp_costpermin" type="number" >
+      <defaultvalue>1</defaultvalue>
+    </setting>
+    <setting name="sp_costpertkt" type="number" >
+      <defaultvalue>5</defaultvalue>
+    </setting>
+    <setting name="sp_minsale" type="number" >
+      <defaultvalue>2</defaultvalue>
+    </setting>
+    <setting name="sp_minchatmins" type="number" >
+      <defaultvalue>2</defaultvalue>
+    </setting>
+    <setting name="sp_preferticket" type="number" >
+      <defaultvalue>15</defaultvalue>
+    </setting>
+    <setting name="sp_forcebill" type="number" >
+      <defaultvalue>0</defaultvalue>
+    </setting>
+    <setting name="sp_forcebillany" type="yesno">
+      <defaultvalue>0</defaultvalue>
+    </setting>
+    <setting name="sp_forcebillafter" type="number" >
+      <defaultvalue>0</defaultvalue>
+    </setting>
+    <setting name="sp_usepackages" type="yesno">
+      <defaultvalue>1</defaultvalue>
+    </setting>
+    <setting name="sp_invoicefooter" type="text">
+      <defaultvalue>You paya your bill or we breaka your knees</defaultvalue>
+    </setting>
+    <setting name="sp_chargedepts" type="custom">
+      <customcode>
+        <![CDATA[
+<select name="sp_chargedepts[]" class="swiftselect" multiple>
+<?php global $SPFunctions; $SPFunctions->genDeptSelect(); ?>
+</select>
+]]>
+      </customcode>
+    </setting>
+    <setting name="sp_autobilllive" type="yesno">
+      <defaultvalue>1</defaultvalue>
+    </setting>
+    <setting name="sp_autobilltkt" type="yesno">
+      <defaultvalue>1</defaultvalue>
+    </setting>
+    <setting name="sp_billimmediately" type="yesno">
+      <defaultvalue>0</defaultvalue>
+    </setting>
+    <setting name="sp_authbuyenable" type="yesno">
+      <defaultvalue>0</defaultvalue>
+    </setting>
+    <setting name="sp_recurenable" type="yesno">
+      <defaultvalue>1</defaultvalue>
+    </setting>
+    <setting name="sp_send_credemail" type="yesno">
+      <defaultvalue>1</defaultvalue>
+    </setting>
+    <setting name="sp_credemail_threshold_mins" type="number">
+      <defaultvalue>999999</defaultvalue>
+    </setting>
+    <setting name="sp_credemail_threshold_tkts" type="number">
+      <defaultvalue>999999</defaultvalue>
+    </setting>
+    <setting name="sp_credemail_interval" type="number">
+      <defaultvalue>0</defaultvalue>
+    </setting>
+    <setting name="sp_credemail_from" type="text" />
+    <setting name="sp_credemail_subject" type="text" />
+    <setting name="sp_purchase_redirect" type="yesno">
+      <defaultvalue>0</defaultvalue>
+    </setting>
+    <setting name="sp_purchase_redirect_url" type="text" />
+    <setting name="sp_purchase_redirect_msg" type="text">
+      <defaultvalue>
+        <![CDATA[<span style='font-style: italic; color: red;'>You do not have enough credit to post!</span>]]></defaultvalue>
+    </setting>
+
+    <!-- Paypal user stuff -->
+    <setting name="sps_paypal" type="title" />
+      <setting name="sp_paypaluserid" type="custom">
+        <customcode>
+          <![CDATA[<?php
+global $SPFunctions;
+$SPFunctions->showTestPayPalButton(false);
+?>]]>
+        </customcode>
+      </setting>
+      <setting name="sp_paypalpasswd" type="password" />
+    <setting name="sp_paypalsign" type="password" />
+      <setting name="sp_paypalsbuserid" type="custom">
+        <customcode>
+          <![CDATA[<?php
+global $SPFunctions;
+$SPFunctions->showTestPayPalButton(true);
+?>]]>
+        </customcode>
+      </setting>
+      <setting name="sp_paypalsbpasswd" type="password" />
+    <setting name="sp_paypalsbsign" type="password" />
+    <setting name="sp_paypallive" type="yesno">
+      <defaultvalue>0</defaultvalue>
+    </setting>
+    <setting name="sp_paypallocale" type="custom" >
+      <defaultvalue>GB</defaultvalue>
+      <customcode>
+        <![CDATA[
+<select name="sp_paypallocale" class="swiftselect">
+<?php
+global $sp_localelist;
+foreach ($sp_localelist as $lcode) {
+  echo "<option value='".$lcode."' ".($lcode == $_SWIFT->Settings->getKey("settings","sp_paypallocale") ? "selected":"").
+  ">".$_SWIFT->Language->Get("sp_pplc_".$lcode)."</option>";
+}
+?>
+</select>
+      ]]>
+      </customcode>
+    </setting>
+    <setting name="sp_paypalipn" type="yesno">
+      <defaultvalue>1</defaultvalue>
+    </setting>
+    <setting name="sp_paypalipnurl" type="text"/>
+    <setting name="sp_paypalimgurl" type="text"/>
+    <setting name="sp_paypalbgcolor" type="color">
+      <defaultvalue>#FFFFFF</defaultvalue>
+    </setting>
+    <setting name="sp_paypalformcolor" type="color">
+      <defaultvalue>#FFFFFF</defaultvalue>
+    </setting>
+
+    <setting name="sp_paypalwpp" type="custom">
+      <defaultvalue>EC</defaultvalue>
+      <customcode>
+        <![CDATA[
+<select name="sp_paypalwpp" class="swiftselect">
+<?php
+echo "<option value='WPP' " .($_SWIFT->Settings->getKey("settings","sp_paypalwpp") == "WPP" ? "selected":"").">Website Payments Pro</option>\n";
+echo "<option value='EC' " .($_SWIFT->Settings->getKey("settings","sp_paypalwpp") == "EC" ? "selected":"").">Express Checkout</option>\n";
+?>
+</select>
+        ]]>
+      </customcode>
+    </setting>
+
+    <!-- Authorize.net user stuff -->
+    <setting name="sps_authorizenet" type="title" />
+    <setting name="sp_anlive" type="yesno">
+      <defaultvalue>0</defaultvalue>
+    </setting>
+    <setting name="sp_anloginid" type="text">
+    </setting>
+    <setting name="sp_antxkey" type="password">
+    </setting>
+    <setting name="sp_anmd5" type="password">
+    </setting>
+    <setting name="sp_anipnurl" type="text"/>
+
+    <!-- Worldpay stuff -->
+    <setting name="sps_worldpay" type="title" />
+    <setting name="sp_worldpayinstid" type="number" >
+      <defaultvalue></defaultvalue>
+    </setting>
+    <setting name="sp_worldpaylive" type="yesno">
+      <defaultvalue>0</defaultvalue>
+    </setting>
+    <setting name="sp_wp_md5pass" type="password">
+    </setting>
+    <setting name="sp_wp_callbackpw" type="password">
+    </setting>
+
+    <!-- Affiliate stuff -->
+    <setting name="sps_affiliate" type="title" />
+    <setting name="sp_affiliate" type="yesno">
+      <defaultvalue>1</defaultvalue>
+    </setting>
+    <setting name="sp_affminmult" type="number" >
+      <defaultvalue>10</defaultvalue>
+    </setting>
+    <setting name="sp_afftktmult" type="number" >
+      <defaultvalue>10</defaultvalue>
+    </setting>
+    <setting name="sp_affmsg" type="text">
+      <defaultvalue>Join us!</defaultvalue>
+    </setting>
+    <setting name="sp_affexpiry" type="number">
+      <defaultvalue>30</defaultvalue>
+    </setting>
+
+    <!-- Account manager stuff -->
+    <setting name="sps_acctmgr" type="title" />
+    <setting name="sp_amenable" type="yesno">
+      <defaultvalue>1</defaultvalue>
+    </setting>
+    <setting name="sp_am_native" type="yesno">
+      <defaultvalue>0</defaultvalue>
+    </setting>
+    <setting name="sp_amexpiry" type="number">
+      <defaultvalue>14</defaultvalue>
+    </setting>
+    <setting name="sp_accmgrsubject" type="text">
+      <defaultvalue>Message from your Account Manager</defaultvalue>
+    </setting>
+
+    <!-- Maintenance -->
+    <setting name="sps_maintenance" type="title" />
+    <setting name="sp_pmexpiry" type="number" >
+      <defaultvalue>180</defaultvalue>
+    </setting>
+
+    <!-- Overdraft (payment on account) stuff -->
+    <setting name="sps_overdraft" type="title" />
+    <setting name="sp_odenable" type="yesno">
+      <defaultvalue>1</defaultvalue>
+    </setting>
+    <setting name="sp_oddefault" type="number">
+      <defaultvalue>500</defaultvalue>
+    </setting>
+    <setting name="sp_odshowinclusive" type="yesno">
+      <defaultvalue>1</defaultvalue>
+    </setting>
+    <setting name="sp_invoicesubject" type="text">
+      <defaultvalue>Your Monthly Invoice</defaultvalue>
+    </setting>
+    <setting name="sp_invoicesender" type="text">
+      <defaultvalue></defaultvalue>
+    </setting>
+
+    <!-- Staff payment stuff -->
+    <!--
+    <setting name="sps_staffpay" type="title" />
+    <setting name="sp_paystafftype" type="custom">
+      <defaultvalue>fixedtkt</defaultvalue>
+      <customcode>
+        <![CDATA[
+<select name="sp_paystafftype" class="swiftselect">
+<?php
+global $SPFunctions; 
+echo "<option value='fixedtkt' " .($_SWIFT->Settings->getKey("settings","sp_paystafftype") == "fixedtkt" ? "selected":"").">".$SPFunctions->formatMTP($_SWIFT->Language->Get("sp_sppertkt"))."</option>\n";
+echo "<option value='permin' " .($_SWIFT->Settings->getKey("settings","sp_paystafftype") == "permin" ? "selected":"").">".$SPFunctions->formatMTP($_SWIFT->Language->Get("sp_sppermin"))."</option>\n";
+?>
+</select>
+        ]]>
+      </customcode>
+    </setting>
+-->
+    
+    <!-- VirtueMart stuff -->
+    <setting name="sps_virtuemart" type="title" />
+    <setting name="sp_vm_dbname" type="text" >
+      <defaultvalue></defaultvalue>
+    </setting>
+    <setting name="sp_vm_dbhost" type="text" >
+      <defaultvalue>localhost:3306</defaultvalue>
+    </setting>
+    <setting name="sp_vm_username" type="text" >
+      <defaultvalue></defaultvalue>
+    </setting>
+    <setting name="sp_vm_password" type="password" >
+      <defaultvalue></defaultvalue>
+    </setting>
+    <setting name="sp_vm_vendorid" type="number" >
+      <defaultvalue></defaultvalue>
+    </setting>
+
+    <!-- WHMCS stuff -->
+    <setting name="sps_whmcs" type="title" />
+    <setting name="sp_whmcs_enable" type="yesno">
+      <defaultvalue>0</defaultvalue>
+    </setting>
+    <setting name="sp_whmcs_api_baseURL" type="custom">
+      <defaultvalue>http://localhost/WHMCS/</defaultvalue>
+      <customcode>
+        <![CDATA[<?php
+global $SPFunctions;
+$SPFunctions->showTestWHMCSButton();
+?>]]>
+      </customcode>
+    </setting>
+    <setting name="sp_whmcs_web_userid" type="text">
+    </setting>
+    <setting name="sp_whmcs_web_pass" type="password">
+    </setting>
+    <setting name="sp_whmcs_api_userid" type="text">
+    </setting>
+    <setting name="sp_whmcs_api_pass" type="password">
+    </setting>
+    <setting name="sp_whmcs_lisfallback" type="yesno">
+      <defaultvalue>0</defaultvalue>
+    </setting>
+    <setting name="sp_whmcs_addusers" type="yesno">
+      <defaultvalue>1</defaultvalue>
+    </setting>
+    <setting name="sp_whmcs_packages" type="yesno">
+      <defaultvalue>1</defaultvalue>
+    </setting>
+    <setting name="sp_whmcs_defaultgroup" type="custom">
+      <defaultvalue>1</defaultvalue>
+      <customcode>
+      <![CDATA[<select name="sp_whmcs_defaultgroup" class="swiftselect">
+<?php
+global $SPFunctions; echo $SPFunctions->getUserGroupList($_SWIFT->Settings->getKey("settings","sp_whmcs_defaultgroup"));
+?>
+</select>]]>
+      </customcode>
+    </setting>
+    <setting name="sp_whmcs_pushmode" type="custom" >
+    <defaultvalue>0</defaultvalue>
+    <customcode>
+      <![CDATA[<select name="sp_whmcs_pushmode" class="swiftselect">
+<?php
+global $SPFunctions; echo $SPFunctions->getWHMCSPushModes($_SWIFT->Settings->getKey("settings","sp_whmcs_pushmode"));
+?>
+</select>]]>
+      </customcode>
+    </setting>
+      <setting name="sp_lastwhmcscron" type="hidden" >
+        <defaultvalue>0</defaultvalue>
+      </setting>
+      <setting name="sp_whmcs_dateformat" type="custom">
+        <defaultvalue>0</defaultvalue>
+        <customcode>
+          <![CDATA[<select name="sp_whmcs_dateformat" class="swiftselect">
+<?php
+global $SPFunctions; echo $SPFunctions->getWHMCSDate($_SWIFT->Settings->getKey("settings","sp_whmcs_dateformat"));
+?>
+</select>]]>
+        </customcode>
+      </setting>
+
+    <setting name="sps_gatekeeper" type="title" />
+      <setting name="sp_gatekeeper" type="yesno">
+        <defaultvalue>0</defaultvalue>
+      </setting>
+      <setting name="sp_gk_subject" type="text">
+        <defaultvalue>Please add credit to your account</defaultvalue>
+      </setting>
+      <setting name="sp_gk_fromstatus" type="custom" >
+      <customcode>
+        <![CDATA[<select name="sp_gk_fromstatus" class="swiftselect">
+<?php
+global $SPFunctions; echo $SPFunctions->genTicketStatusSelect("sp_gk_fromstatus");
+?>
+</select>]]>
+      </customcode>
+    </setting>
+      <setting name="sp_gk_tostatus" type="custom" >
+        <customcode>
+          <![CDATA[<select name="sp_gk_tostatus" class="swiftselect">
+<?php
+global $SPFunctions; echo $SPFunctions->genTicketStatusSelect("sp_gk_tostatus");
+?>
+</select>]]>
+        </customcode>
+      </setting>
+      
+      <!-- MUST always be last in the group!!! -->
+    <setting name="sp_dummy" type="custom" >
+      <defaultvalue>0</defaultvalue>
+      <customcode>
+        <![CDATA[<?php global $SPFunctions; $SPFunctions->encryptAllPasswords(); ?>]]>
+      </customcode>
+    </setting>
+
+  </group>
+  <group name="settings_sp_perms" module="supportpay"  app="supportpay" ishidden="0">
+    <setting name="sp_cananswertkts" type="custom" >
+      <defaultvalue>0</defaultvalue>
+      <customcode>
+        <![CDATA[<select name="sp_cananswertkts[]" class="swiftselect" multiple>
+<?php SWIFT_Loader::LoadLibrary('SupportPay:SPFunctions', "supportpay"); 
+global $SPFunctions;
+$_SWIFT = SWIFT::GetInstance();
+if (method_exists($_SWIFT->Language, "LoadModule")) {
+	$_SWIFT->Language->LoadModule(SWIFT_LanguageEngine::DEFAULT_LOCALE, "supportpay");
+} else {
+	$_SWIFT->Language->LoadApp(SWIFT_LanguageEngine::DEFAULT_LOCALE, "supportpay");
+}
+$SPFunctions->genSGSelect("sp_cananswertkts"); ?>
+</select>]]>
+      </customcode>
+    </setting>
+    <setting name="sp_canpaytkts" type="custom" >
+      <defaultvalue>0</defaultvalue>
+      <customcode>
+        <![CDATA[<select name="sp_canpaytkts[]" class="swiftselect" multiple>
+<?php global $SPFunctions; $SPFunctions->genSGSelect("sp_canpaytkts"); ?>
+</select>]]>
+      </customcode>
+    </setting>
+    <setting name="sp_canpaylive" type="custom" >
+      <defaultvalue>0</defaultvalue>
+      <customcode>
+        <![CDATA[<select name="sp_canpaylive[]" class="swiftselect" multiple>
+<?php global $SPFunctions; $SPFunctions->genSGSelect("sp_canpaylive"); ?>
+</select>]]>
+      </customcode>
+    </setting>
+    <setting name="sp_canusercdt" type="custom" >
+      <defaultvalue>0</defaultvalue>
+      <customcode>
+        <![CDATA[<select name="sp_canusercdt[]" class="swiftselect" multiple>
+<?php global $SPFunctions; $SPFunctions->genSGSelect("sp_canusercdt"); ?>
+</select>]]>
+      </customcode>
+    </setting>
+    <setting name="sp_canlistaff" type="custom" >
+      <defaultvalue>0</defaultvalue>
+      <customcode>
+        <![CDATA[<select name="sp_canlistaff[]" class="swiftselect" multiple>
+<?php global $SPFunctions; $SPFunctions->genSGSelect("sp_canlistaff"); ?>
+</select>]]>
+      </customcode>
+    </setting>
+    <setting name="sp_cansetmgr" type="custom" >
+      <defaultvalue>0</defaultvalue>
+      <customcode>
+        <![CDATA[<select name="sp_cansetmgr[]" class="swiftselect" multiple>
+<?php global $SPFunctions; $SPFunctions->genSGSelect("sp_cansetmgr"); ?>
+</select>]]>
+      </customcode>
+    </setting>
+    <setting name="sp_cansetdscnt" type="custom" >
+      <defaultvalue>0</defaultvalue>
+      <customcode>
+        <![CDATA[<select name="sp_cansetdscnt[]" class="swiftselect" multiple>
+<?php global $SPFunctions; $SPFunctions->genSGSelect("sp_cansetdscnt"); ?>
+</select>]]>
+      </customcode>
+    </setting>
+    <setting name="sp_canchangecredit" type="custom" >
+      <defaultvalue>0</defaultvalue>
+      <customcode>
+        <![CDATA[<select name="sp_canchangecredit[]" class="swiftselect" multiple>
+<?php global $SPFunctions; $SPFunctions->genSGSelect("sp_canchangecredit"); ?>
+</select>]]>
+      </customcode>
+    </setting>
+    <setting name="sp_cansetoverdraft" type="custom" >
+      <defaultvalue>0</defaultvalue>
+      <customcode>
+        <![CDATA[<select name="sp_cansetoverdraft[]" class="swiftselect" multiple>
+<?php global $SPFunctions; $SPFunctions->genSGSelect("sp_cansetoverdraft"); ?>
+</select>]]>
+      </customcode>
+    </setting>
+  </group>
+</swiftsettings>
